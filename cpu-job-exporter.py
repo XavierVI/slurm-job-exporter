@@ -222,8 +222,14 @@ class SlurmJobCollector(object):
                 pass
 
             with open(os.path.join(job_dir, ('memory.limit_in_bytes' if cgroups == 1 else 'memory.max')), 'r') as f_limit:
-                gauge_memory_limit.add_metric(
-                    [user, account, job], int(f_limit.read()))
+                val = f_limit.read()
+                if cgroups == 2 and val.strip() == 'max':
+                    # unlimited memory
+                    gauge_memory_limit.add_metric(
+                        [user, account, job], sys.maxsize)
+                else:
+                    gauge_memory_limit.add_metric(
+                        [user, account, job], int(f_limit.read()))
 
             with open(os.path.join(job_dir, 'memory.stat'), 'r') as f_stats:
                 stats = dict(line.split() for line in f_stats.readlines())
