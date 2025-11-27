@@ -8,7 +8,7 @@ User=prometheus
 Group=prometheus
 WorkingDirectory=/opt/slurm-job-exporter
 ExecStart=/opt/slurm-job-exporter/venv/bin/python /opt/slurm-job-exporter/cpu-job-exporter.py
-PIDFile=/var/run/slurm-job-exporter.pid
+PIDFile=/run/slurm-job-exporter.pid
 KillMode=process
 Environment="PYTHONUNBUFFERED=1"
 
