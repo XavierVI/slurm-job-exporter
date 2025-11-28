@@ -361,9 +361,9 @@ class SlurmJobCollector(object):
                         p.cpu_times().children_system
                     )
                     if name in processes_sum:
-                        processes_sum[exe] += t
+                        processes_sum[name] += t
                     else:
-                        processes_sum[exe] = t
+                        processes_sum[name] = t
                 
                 except psutil.NoSuchProcess:
                     continue
