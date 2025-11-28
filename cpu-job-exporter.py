@@ -354,12 +354,11 @@ class SlurmJobCollector(object):
                         continue
 
                     # otherwise, sum the CPU times
-                    t = (
-                        p.cpu_times().user,
-                        p.cpu_times().system,
-                        p.cpu_times().children_user,
-                        p.cpu_times().children_system
-                    )
+                    t = (p.cpu_times().user +
+                        p.cpu_times().system +
+                        p.cpu_times().children_user +
+                        p.cpu_times().children_system)
+                
                     if name in processes_sum:
                         processes_sum[name] += t
                     else:
