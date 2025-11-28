@@ -345,19 +345,30 @@ class SlurmJobCollector(object):
                 # get the counter_process_usage data
                 try:
                     p = psutil.Process(proc)
+                    # fetch the executable path
                     with p.oneshot():
-                        exe = p.exe()
-                    if os.path.basename(exe) in ['ssh', 'sshd', 'bash', 'srun']:
-                        # We don't want to count them
+                        name = p.name()
+                    
+                    # if the executable is ssh, sshd, bash or srun, we skip it
+                    if name in ['ssh', 'sshd', 'bash', 'srun']:
                         continue
+
+                    # otherwise, sum the CPU times
+                    t = (
+                        p.cpu_times().user,
+                        p.cpu_times().system,
+                        p.cpu_times().children_user,
+                        p.cpu_times().children_system
+                    )
+                    if name in processes_sum:
+                        processes_sum[exe] += t
                     else:
-                        t = p.cpu_times().user + p.cpu_times().system + \
-                            p.cpu_times().children_user + p.cpu_times().children_system
-                        if exe in processes_sum:
-                            processes_sum[exe] += t
-                        else:
-                            processes_sum[exe] = t
+                        processes_sum[exe] = t
+                
                 except psutil.NoSuchProcess:
+                    continue
+                except psutil.AccessDenied:
+                    print("Access denied to process {}".format(proc))
                     continue
 
             # we only count the processes that used more than 60 seconds of CPU
