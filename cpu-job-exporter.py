@@ -63,7 +63,10 @@ def split_range(range_str):
 
 def get_env(pid):
     """
-    Return the environment variables of a process
+    Return the environment variables of a process.
+
+    This is used to retrieve the SLURM_JOB_ACCOUNT, but
+    doesn't work for regular system users.
     """
     try:
         ps = psutil.Process(pid)
@@ -71,6 +74,22 @@ def get_env(pid):
     except psutil.NoSuchProcess:
         raise ValueError("Could not get environment for {}".format(pid))
 
+
+def fetch_slurm_account(jobid):
+    """
+    Use scontrol to get the account for a slurm job.
+    """
+    out = subprocess.run(
+        ["scontrol", "show", "job", jobid],
+        capture_output=True, text=True, check=True
+    ).stdout
+    
+    for line in out.split():
+        if line.startswith("Account="):
+            return line.split("=")[1]
+
+    return None
+    
 
 def cgroup_gpus(job_dir, cgroups):
     if cgroups == 1:
@@ -196,19 +215,7 @@ class SlurmJobCollector(object):
             # Job is alive, we can get the stats
             user = get_username(uid)
 
-            for proc in procs:
-                # get the SLURM_JOB_ACCOUNT
-                try:
-                    envs = get_env(proc)
-                except ValueError:
-                    # Process does not have an environment, its probably gone
-                    continue
-                if 'SLURM_JOB_ACCOUNT' in envs:
-                    account = envs['SLURM_JOB_ACCOUNT']
-                    break
-            else:
-                # Could not find the env variables, slurm_adopt only fill the jobid
-                account = "error"
+            account = fetch_slurm_account(job)                    
 
             with open(os.path.join(job_dir, ('memory.usage_in_bytes' if cgroups == 1 else 'memory.current')), 'r') as f_usage:
                 gauge_memory_usage.add_metric(
