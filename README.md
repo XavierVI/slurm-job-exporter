@@ -1,47 +1,28 @@
 # Slurm-job-exporter
 
-Prometheus exporter for the stats in the cgroup accounting with Slurm. This will also collect stats of a job using NVIDIA GPUs.
+This repository is a fork of https://github.com/guilbaults/slurm-job-exporter.
+
 
 ## Requirements
+The python scripts only require the packages in `requirements.txt`.
 
-Slurm need to be configured with `JobAcctGatherType=jobacct_gather/cgroup`. Stats are collected from the cgroups created by Slurm for each job.
+## Running Slurm exporters as a service
 
-Python 3 with the following modules:
+`systemd/` contains three `.service` files to run either this slurm job exporter or this [slurm exporter](https://github.com/SckyzO/slurm_exporter). More information can be found in `systemd/README.md`.
 
-* `prometheus_client`
-* `nvidia-ml-py` (optional)
-
-DCGM is recommended when NVIDIA GPUs are installed:
-
-* If DCGM is installed and running, it will be used instead of NVML.
-* NVLINK and and a few other stats are only available with DCGM.
-* MIG devices are supported.
-* The proprietary package is required since this is using the profiling module of DCGM (datacenter-gpu-manager-4-proprietary)
-
-`nvidia-smi -L` is run in each cgroup to detect which GPU is allocated to a Slurm job.
 
 ## Usage
 
 ```plaintext
-usage: slurm-job-exporter.py [-h] [--port PORT] [--monitor MONITOR]
-                             [--dcgm-update-interval DCGM_UPDATE_INTERVAL]
+usage: cpu-job-exporter.py [-h] [--port PORT]
 
 Promtheus exporter for jobs running with Slurm within a cgroup
 
 optional arguments:
   -h, --help            show this help message and exit
   --port PORT           Collector http port, default is 9798
-  --monitor MONITOR     GPU data monitor [dcgm|nvml], default is dcgm
-  --dcgm-update-interval DCGM_UPDATE_INTERVAL
-                        DCGM update interval in seconds, default is 10
 ```
 
-## Cgroup v1 vs v2
-
-[Slurm currently supports cgroup v1 and v2](https://slurm.schedmd.com/cgroup_v2.html), but there are some limitations with v2, some metrics are not currently fully available on this exporter:
-
-* `memory.max_usage_in_bytes` becomes `memory.peak`, but this is not in any currently released kernel ([torvalds/linux@8e20d4b](https://github.com/torvalds/linux/commit/8e20d4b332660a32e842e20c34cfc3b3456bc6dc)). This is working on 5.14 kernel on EL9.
-* `cpuacct.usage_percpu` is exposed via eBPF in kernel 6.6+, but not through cgroupfs although it might be for a future kernel. At the moment, the exporter will get the overall CPU usage of the job and divide it by the number of allocated cores to get an average CPU usage per core.
 
 ## Sample
 
