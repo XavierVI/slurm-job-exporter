@@ -8,7 +8,7 @@ The python scripts only require the packages in `requirements.txt`.
 
 ## Running Slurm exporters as a service
 
-`systemd/` contains three `.service` files to run either this slurm job exporter or this [slurm exporter](https://github.com/SckyzO/slurm_exporter). More information can be found in `systemd/README.md`.
+`systemd/` contains three `.service` files to run either this slurm job exporter or this [slurm exporter](https://github.com/SckyzO/slurm_exporter).
 
 
 ## Usage
@@ -201,14 +201,14 @@ slurm_job_nvlink_gpu{account="account4",direction="RX",gpu="0",gpu_type="NVIDIA 
 
 
 ## Grafana Installation
-Grafana can be installed using yum, and automatically creates a service file in `/usr/lib/systemd/system/grafana-server.service`, which can be started using `systemctl enable --now grafana-server`. By default, the Grafana server will listen on localhost:3000.
+Grafana can be [installed using yum](https://grafana.com/grafana/download), and automatically creates a service file in `/usr/lib/systemd/system/grafana-server.service`, which can be started using `systemctl start grafana-server`. By default, the Grafana server will listen on localhost:3000.
 
 
 # Configuration
 
 ## Grafana Configuration
 
-The default location for the grafana configuration file is `/etc/grafana/grafana.ini`.
+The default location for the grafana configuration file is `/etc/grafana/grafana.ini`. In order to get grafana to query prometheus for data, you need to set up a data source. These are actually set up in the admin UI, rather than in the configuration file. This UI also allows you to set up dashboards.
 
 - [Grafana Docs: Configuring Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/)
 
@@ -216,3 +216,15 @@ The default location for the grafana configuration file is `/etc/grafana/grafana
 ## Prometheus Storage
 
 Prometheus stores data in a database. The location of this data and the amount of time data is retained can be configured using the flags `--storage.tsdb.path=/path/to/data` and `--storage.tsdb.retention.time=15d`. You can also set the maximum number of bytes of storage blocks to retain using `--storage.tsdb.retention.size=5GB`. More information on storage can be found [here](https://prometheus.io/docs/prometheus/latest/storage/).
+
+
+
+# Useful Resources
+1. [Prometheus Docs: Getting Started](https://prometheus.io/docs/prometheus/latest/getting_started/)
+2. [Prometheus Docs: Configuration](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
+3. [Prometheus Docs: Storage](https://prometheus.io/docs/prometheus/latest/storage/)
+4. [Prometheus Docs: Data Model](https://prometheus.io/docs/concepts/data_model/)
+5. [Grafana Docs: Configure Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/)
+6. [Grafana Docs: Start Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/)
+7. [Grafana Docs: Data Sources](https://grafana.com/docs/grafana/latest/datasources/)
+8. [Grafana Docs: Visualization](https://grafana.com/docs/grafana/latest/visualizations/)
