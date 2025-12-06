@@ -9,6 +9,7 @@ User=prometheus
 Group=prometheus
 WorkingDirectory=/var/lib/prometheus
 ExecStart=/opt/prometheus-3.7.3.linux-amd64/prometheus \
+        --web.listen-address="127.0.0.1:9090" \
         --config.file=/opt/prometheus-3.7.3.linux-amd64/prometheus-config.yml \
         --storage.tsdb.path=/var/lib/prometheus
 Restart=on-failure
