@@ -1,15 +1,16 @@
 [Unit]
-Description=Slurm-job-exporter
+Description=Slurm job exporter for Prometheus
 After=network.target
-After=nvidia-dcgm.service
-Wants=nvidia-dcgm.service
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/sysconfig/slurm-job-exporter.conf
-ExecStart=/usr/bin/slurm-job-exporter
-PIDFile=/var/run/slurm-job-exporter.pid
+User=prometheus
+Group=prometheus
+WorkingDirectory=/opt/slurm-job-exporter
+ExecStart=/opt/slurm-job-exporter/venv/bin/python /opt/slurm-job-exporter/slurm-job-exporter-cpu.py
+PIDFile=/run/slurm-job-exporter.pid
 KillMode=process
+Environment="PYTHONUNBUFFERED=1"
 
 [Install]
 WantedBy=multi-user.target
