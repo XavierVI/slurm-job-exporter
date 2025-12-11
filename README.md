@@ -191,6 +191,14 @@ slurm_job_nvlink_gpu{account="account4",direction="RX",gpu="0",gpu_type="NVIDIA 
 3. Adjust the paths in `cpu-job-exporter.service` to run the python script.
 4. The service can be enabled and started at this point.
 
+**NOTE**: the service needs to run on a compute node, or at least a node that can see the slurm cgroups. Otherwise this won't work.
+
+## Slurm Exporter
+
+1. Clone the repository: https://github.com/SckyzO/slurm_exporter.
+2. Follow the installation instructions in the repo. This only requires a compiler for golang source code. No external dependencies are required.
+3. The repo provides an example service file in `systemd`. This service can be ran on the head node, or any node that has access to slurm commands.
+
 
 ## Prometheus Installation
 
